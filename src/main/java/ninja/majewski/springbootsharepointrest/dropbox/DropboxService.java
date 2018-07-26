@@ -19,4 +19,8 @@ public interface DropboxService {
     ListFolderResult listFolder(String folderPath, Boolean recursiveListing, Long limit) throws DropboxException;
 
     ListFolderResult listFolderContinue(String cursorId) throws DropboxException;
+
+    void removeFile(String filePath);
+
+    void removeFolder(String folderPath);
 }

@@ -1,8 +1,8 @@
 package ninja.majewski.springbootsharepointrest.dropbox;
 
 @FunctionalInterface
-interface DropboxActionSupplier<T> {
+interface DropboxActionResolver<T> {
 
-    T get() throws Exception;
+    T perform() throws Exception;
 
 }

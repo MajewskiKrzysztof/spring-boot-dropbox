@@ -69,6 +69,16 @@ class DropboxServiceImpl implements DropboxService {
         return (T) metadata;
     }
 
+    @Override
+    public void removeFile(String filePath) {
+        // todo
+    }
+
+    @Override
+    public void removeFolder(String folderPath) {
+        // todo
+    }
+
     private <T> void checkIfMetadataIsInstanceOfGivenType(Metadata metadata, Class<T> validType, String exceptionMessage) {
         boolean isValidType = validType.isInstance(metadata);
         if (!isValidType) {
@@ -76,9 +86,9 @@ class DropboxServiceImpl implements DropboxService {
         }
     }
 
-    private <T> T handleDropboxAction(DropboxActionSupplier<T> action, String exceptionMessage) {
+    private <T> T handleDropboxAction(DropboxActionResolver<T> action, String exceptionMessage) {
         try {
-            return action.get();
+            return action.perform();
         } catch (Exception e) {
             throw new DropboxException(exceptionMessage, e);
         }
