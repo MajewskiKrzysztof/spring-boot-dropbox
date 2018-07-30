@@ -1,5 +1,6 @@
 package ninja.majewski.springbootsharepointrest.dropbox;
 
+import com.dropbox.core.v2.files.CreateFolderResult;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
@@ -12,15 +13,17 @@ public interface DropboxService {
 
     FileMetadata uploadFile(String filePath, InputStream fileStream) throws DropboxException;
 
+    CreateFolderResult createFolder(String folderPath);
+
     FolderMetadata getFolderDetails(String folderPath) throws DropboxException;
 
     FileMetadata getFileDetails(String filePath) throws DropboxException;
 
     ListFolderResult listFolder(String folderPath, Boolean recursiveListing, Long limit) throws DropboxException;
 
-    ListFolderResult listFolderContinue(String cursorId) throws DropboxException;
+    ListFolderResult listFolderContinue(String cursor) throws DropboxException;
 
-    void removeFile(String filePath);
+    void deleteFile(String filePath);
 
-    void removeFolder(String folderPath);
+    void deleteFolder(String folderPath);
 }

@@ -27,6 +27,7 @@ repositories {
 dependencies {
     compile('org.springframework.boot:spring-boot-starter')
     compile group: 'com.dropbox.core', name: 'dropbox-core-sdk', version: '3.0.8'
+    compile group: 'org.apache.commons', name: 'commons-io', version: '1.3.2'
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
