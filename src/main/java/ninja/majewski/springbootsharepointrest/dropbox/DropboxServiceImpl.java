@@ -8,7 +8,6 @@ import com.dropbox.core.v2.files.ListFolderBuilder;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import java.io.InputStream;
-import java.util.Objects;
 import ninja.majewski.springbootsharepointrest.dropbox.exception.DropboxException;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +21,13 @@ class DropboxServiceImpl implements DropboxService {
     }
 
     @Override
-    public InputStream downloadFile(String filePath) throws DropboxException {
+    public InputStream downloadFile(String filePath) {
         return handleDropboxAction(() -> client.files().download(filePath).getInputStream(),
                 String.format("Error downloading file: %s", filePath));
     }
 
     @Override
-    public FileMetadata uploadFile(String filePath, InputStream fileStream) throws DropboxException {
+    public FileMetadata uploadFile(String filePath, InputStream fileStream) {
         return handleDropboxAction(() -> client.files().uploadBuilder(filePath).uploadAndFinish(fileStream),
                 String.format("Error uploading file: %s", filePath));
     }
@@ -39,30 +38,26 @@ class DropboxServiceImpl implements DropboxService {
     }
 
     @Override
-    public FolderMetadata getFolderDetails(String folderPath) throws DropboxException {
+    public FolderMetadata getFolderDetails(String folderPath) {
         return getMetadata(folderPath, FolderMetadata.class, String.format("Error getting folder details: %s", folderPath));
     }
 
     @Override
-    public FileMetadata getFileDetails(String filePath) throws DropboxException {
+    public FileMetadata getFileDetails(String filePath) {
         return getMetadata(filePath, FileMetadata.class, String.format("Error getting file details: %s", filePath));
     }
 
     @Override
-    public ListFolderResult listFolder(String folderPath, Boolean recursiveListing, Long limit) throws DropboxException {
+    public ListFolderResult listFolder(String folderPath, boolean recursiveListing, long limit) {
         ListFolderBuilder listFolderBuilder = client.files().listFolderBuilder(folderPath);
-        if (Objects.nonNull(recursiveListing)) {
-            listFolderBuilder.withRecursive(recursiveListing);
-        }
-        if (Objects.nonNull(limit)) {
-            listFolderBuilder.withLimit(limit);
-        }
+        listFolderBuilder.withRecursive(recursiveListing);
+        listFolderBuilder.withLimit(limit);
 
         return handleDropboxAction(listFolderBuilder::start, String.format("Error listing folder: %s", folderPath));
     }
 
     @Override
-    public ListFolderResult listFolderContinue(String cursor) throws DropboxException {
+    public ListFolderResult listFolderContinue(String cursor) {
         return handleDropboxAction(() -> client.files().listFolderContinue(cursor), "Error listing folder");
     }
 
