@@ -61,7 +61,10 @@ public class DropboxIntTest {
 
     @Test
     public void downloadFile_shouldReturnNotEmptyInputStream() throws Exception {
+        // when
         InputStream inputStream = dropboxService.downloadFile(TEST_FILE_PATH);
+
+        // then
         assertThat(inputStream.available()).isEqualTo(TEST_FILE_SIZE);
     }
 
@@ -73,18 +76,27 @@ public class DropboxIntTest {
 
     @Test
     public void uploadFile_shouldReturnUploadedFileDetails() throws Exception {
+        // given
         File tempUploadFile = temporaryFolder.newFile("teamLogo.png");
         String filePath = String.format("%s/%s", TEST_FOLDER_PATH, tempUploadFile.getName());
+
+        // when
         FileMetadata fileMetadata = dropboxService.uploadFile(filePath, new FileInputStream(tempUploadFile));
+
+        // then
         assertThat(fileMetadata.getId()).isNotBlank();
     }
 
     @Test
     public void uploadFile_shouldCreateFolderIfNotExists() throws Exception {
+        // given
         File tempUploadFile = temporaryFolder.newFile("teamLogo.png");
         String filePath = String.format("%s/%s/%s", TEST_FOLDER_PATH, "not existing folder", tempUploadFile.getName());
+
+        // when
         dropboxService.uploadFile(filePath, new FileInputStream(tempUploadFile));
 
+        // then
         FolderMetadata folderDetails = dropboxService
                 .getFolderDetails(String.format("%s/%s", TEST_FOLDER_PATH, "not existing folder"));
         assertThat(folderDetails.getId()).isNotBlank();
@@ -92,28 +104,37 @@ public class DropboxIntTest {
 
     @Test
     public void createFolder_shouldCreateFolder() {
+        // given
         String folderPath = String.format("%s/%s", TEST_FOLDER_PATH, "new folder");
-        CreateFolderResult folder = dropboxService.createFolder(folderPath);
 
+        // when
+        CreateFolderResult folder = dropboxService.createFolder(folderPath);
         FolderMetadata folderDetails = dropboxService.getFolderDetails(folderPath);
+
+        // then
         assertThat(folderDetails.getId()).isNotBlank();
         assertThat(folderDetails.getId()).isEqualToIgnoringCase(folder.getMetadata().getId());
     }
 
     @Test
     public void createFolder_shouldThrowExceptionIfFolderAlreadyExists() {
+        // given
         String folderPath = String.format("%s/%s", TEST_FOLDER_PATH, "new folder");
 
+        // when
         dropboxService.createFolder(folderPath);
 
+        // then
         exceptions.expect(DropboxException.class);
         dropboxService.createFolder(folderPath);
     }
 
     @Test
     public void getFolderDetails_shouldReturnFolderDetails() {
+        // when
         FolderMetadata folderDetails = dropboxService.getFolderDetails(TEST_FOLDER_PATH);
 
+        // then
         assertThat(folderDetails.getId()).isNotBlank();
         assertThat(folderDetails.getName()).isNotBlank();
         assertThat(folderDetails.getPathDisplay()).isNotBlank();
@@ -127,8 +148,10 @@ public class DropboxIntTest {
 
     @Test
     public void getFileDetails_shouldReturnFileDetails() {
+        // when
         FileMetadata fileDetails = dropboxService.getFileDetails(TEST_FILE_PATH);
 
+        // then
         assertThat(fileDetails.getId()).isNotBlank();
         assertThat(fileDetails.getPathDisplay()).isNotBlank();
         assertThat(fileDetails.getName()).isNotBlank();
@@ -145,6 +168,7 @@ public class DropboxIntTest {
 
     @Test
     public void listFolder_shouldReturnFolderItems() throws Exception {
+        // given
         File tempUploadFile1 = temporaryFolder.newFile("testFile2.txt");
         FileUtils.writeStringToFile(tempUploadFile1, "test file content", "UTF-8");
         String testFilePath1 = String.format("%s/%s", TEST_FOLDER_PATH, "testFile2.txt");
@@ -155,7 +179,10 @@ public class DropboxIntTest {
         String testFilePath2 = String.format("%s/%s/%s", TEST_FOLDER_PATH, "inner folder", "testFile3.txt");
         dropboxService.uploadFile(testFilePath2, new FileInputStream(tempUploadFile2));
 
+        // when
         ListFolderResult listFolderResult = dropboxService.listFolder(TEST_FOLDER_PATH, true, 10L);
+
+        // then
         assertThat(listFolderResult.getEntries()).hasSize(5);
 
         List<FileMetadata> files = listFolderResult.getEntries().stream()
@@ -179,11 +206,15 @@ public class DropboxIntTest {
 
     @Test
     public void listFolderContinue_shouldListNextPathOfItems() throws Exception {
+        // given
         File tempUploadFile = temporaryFolder.newFile("testFile2.txt");
         FileUtils.writeStringToFile(tempUploadFile, "test file content", "UTF-8");
         String testFilePath1 = String.format("%s/%s", TEST_FOLDER_PATH, "testFile2.txt");
+
+        // when
         dropboxService.uploadFile(testFilePath1, new FileInputStream(tempUploadFile));
 
+        // then
         ListFolderResult listFolderResult = dropboxService.listFolder(TEST_FOLDER_PATH, false, 1L);
         assertThat(listFolderResult.getEntries()).hasSize(1);
 
@@ -204,11 +235,14 @@ public class DropboxIntTest {
 
     @Test
     public void deleteFile_shouldDeleteFile() {
+        // given
         FileMetadata fileDetails = dropboxService.getFileDetails(TEST_FILE_PATH);
         assertThat(fileDetails.getId()).isNotBlank();
 
+        // when
         dropboxService.deleteFile(TEST_FILE_PATH);
 
+        // then
         exceptions.expect(DropboxException.class);
         dropboxService.getFileDetails(TEST_FILE_PATH);
     }
@@ -221,14 +255,17 @@ public class DropboxIntTest {
 
     @Test
     public void deleteFolder_shouldDeleteFolder() {
+        // given
         String testFolder = String.format("%s/%s", TEST_FOLDER_PATH, "test folder");
         dropboxService.createFolder(testFolder);
         
         FolderMetadata folderDetails = dropboxService.getFolderDetails(testFolder);
         assertThat(folderDetails.getId()).isNotBlank();
-        
+
+        // when
         dropboxService.deleteFolder(testFolder);
 
+        // then
         exceptions.expect(DropboxException.class);
         dropboxService.getFolderDetails(testFolder);
     }
